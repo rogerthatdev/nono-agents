@@ -4,7 +4,7 @@ import cards
 from autogen import ConversableAgent
 dotenv.load_dotenv()
 
-test_card = cards.GameCard(word="pizza", nonoWords=["cheese", "slice", "pepperoni", "crust", "oven"], category="food")
+test_card = cards.new_card
 
 default_llm_config = {"config_list": [{"model": "gpt-4", "api_key": os.environ["OPENAI_API_KEY"]}]}
 
@@ -12,7 +12,7 @@ system_message = """
 You are playing a card game. The rules are:
 1. There are 2 players: clue giver and word guesser.
 2. The clue giver will be given a card with 3 things: a word, category, and a
-   list of 5 nono words.
+   list of 8 nono words.
 3. The clue giver will start by providing the category and one clue for what
    the word is. The clue giver cannot say any words or variations of the words
    on the nono list. The clue must be one word.
