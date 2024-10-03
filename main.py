@@ -41,7 +41,8 @@ player_two = ConversableAgent(
     system_message=system_message.format(role="word guesser"),
     llm_config=other_llm_config,
     is_termination_msg=lambda msg: "Correctamundo" in msg["content"],  # terminate if the word is guessed
-    human_input_mode="NEVER",
+   #  human_input_mode="ALWAYS",
+   human_input_mode="NEVER"
 )
 
 result = player_two.initiate_chat(
