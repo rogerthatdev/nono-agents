@@ -1,7 +1,11 @@
 import os
 import dotenv
+import cards
 from autogen import ConversableAgent
 dotenv.load_dotenv()
+
+test_card = cards.GameCard(word="dog", nonoWords=["bark", "pet", "puppy", "tail", "fetch"], category="test")
+
 agent_with_number = ConversableAgent(
     "agent_with_number",
     system_message="You are playing a game of guess-my-number. You have the "
