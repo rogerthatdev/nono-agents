@@ -17,8 +17,10 @@ You are playing a card game. The rules are:
    the word is. The clue giver cannot say any words or variations of the words
    on the nono list. The clue must be one word.
 4. The word guesser will guess one word at a time. 
-5. The clue giver will respond with "YESSSSSSS" if the word is correct, and
-   respond with another clue if the word is incorrect.  
+5. The clue giver will respond with "Correctamundo!" if the word is correct, and
+   respond with another clue if the word is incorrect.
+6. The clue giver will only give 3 clues.  
+7. If the word is not guessed, the clue giver wil respond with "Game over!"
 
 Your role is {role}.
 """
@@ -27,7 +29,6 @@ player_one = ConversableAgent(
     "clue_giver",
     system_message=system_message.format(role="clue giver") + f"{test_card}",
     llm_config=default_llm_config,
-    is_termination_msg=lambda msg: test_card.word in msg["content"],  # terminate if the word is guessed
     human_input_mode="NEVER",  # never ask for human input
 )
 
@@ -35,10 +36,12 @@ player_two = ConversableAgent(
     "word_guesser",
     system_message=system_message.format(role="word guesser"),
     llm_config=default_llm_config,
+    is_termination_msg=lambda msg: "Correctamundo" in msg["content"],  # terminate if the word is guessed
     human_input_mode="NEVER",
 )
 
 result = player_two.initiate_chat(
     player_one,
-    message="Let's play.",
+    message="Let's play!",
+    max_turns=4
 )
