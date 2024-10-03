@@ -4,28 +4,41 @@ import cards
 from autogen import ConversableAgent
 dotenv.load_dotenv()
 
-test_card = cards.GameCard(word="dog", nonoWords=["bark", "pet", "puppy", "tail", "fetch"], category="test")
+test_card = cards.GameCard(word="pizza", nonoWords=["cheese", "slice", "pepperoni", "crust", "oven"], category="food")
 
-agent_with_number = ConversableAgent(
-    "agent_with_number",
-    system_message="You are playing a game of guess-my-number. You have the "
-    "number 53 in your mind, and I will try to guess it. "
-    "If I guess too high, say 'too high', if I guess too low, say 'too low'. ",
-    llm_config={"config_list": [{"model": "gpt-4", "api_key": os.environ["OPENAI_API_KEY"]}]},
-    is_termination_msg=lambda msg: "53" in msg["content"],  # terminate if the number is guessed by the other agent
+default_llm_config = {"config_list": [{"model": "gpt-4", "api_key": os.environ["OPENAI_API_KEY"]}]}
+
+system_message = """
+You are playing a card game. The rules are:
+1. There are 2 players: clue giver and word guesser.
+2. The clue giver will be given a card with 3 things: a word, category, and a
+   list of 5 nono words.
+3. The clue giver will start by providing the category and one clue for what
+   the word is. The clue giver cannot say any words or variations of the words
+   on the nono list. The clue must be one word.
+4. The word guesser will guess one word at a time. 
+5. The clue giver will respond with "YESSSSSSS" if the word is correct, and
+   respond with another clue if the word is incorrect.  
+
+Your role is {role}.
+"""
+
+player_one = ConversableAgent(
+    "clue_giver",
+    system_message=system_message.format(role="clue giver") + f"{test_card}",
+    llm_config=default_llm_config,
+    is_termination_msg=lambda msg: test_card.word in msg["content"],  # terminate if the word is guessed
     human_input_mode="NEVER",  # never ask for human input
 )
 
-agent_guess_number = ConversableAgent(
-    "agent_guess_number",
-    system_message="I have a number in my mind, and you will try to guess it. "
-    "If I say 'too high', you should guess a lower number. If I say 'too low', "
-    "you should guess a higher number. ",
-    llm_config={"config_list": [{"model": "gpt-4", "api_key": os.environ["OPENAI_API_KEY"]}]},
+player_two = ConversableAgent(
+    "word_guesser",
+    system_message=system_message.format(role="word guesser"),
+    llm_config=default_llm_config,
     human_input_mode="NEVER",
 )
 
-result = agent_with_number.initiate_chat(
-    agent_guess_number,
-    message="I have a number between 1 and 100. Guess it!",
+result = player_two.initiate_chat(
+    player_one,
+    message="Let's play.",
 )
