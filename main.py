@@ -1,11 +1,11 @@
 import os
 import dotenv
  
-from autogen import ConversableAgent, GroupChat, GroupChatManager
+from autogen import ConversableAgent, GroupChat, GroupChatManager, register_function
 from cards import createCard
 dotenv.load_dotenv()
 
-test_card = createCard()
+# test_card = createCard()
 
 default_llm_config = {"config_list": [{"model": "gpt-4", "api_key": os.environ["OPENAI_API_KEY"]}]}
 
@@ -32,7 +32,7 @@ Your role is {role}.
 
 player_one = ConversableAgent(
     "clue_giver",
-    system_message=system_message.format(role="clue giver") + f"{test_card}",
+    system_message=system_message.format(role="clue giver"),
     llm_config=default_llm_config,
     human_input_mode="NEVER",  # never ask for human input
     description="The clue giver will provide clues to the word guesser based on a provided card",
@@ -55,6 +55,13 @@ group_chat_manager = GroupChatManager(
     groupchat=group_chat,
     is_termination_msg=lambda msg: "Correctamundo" in msg["content"],  # terminate if the word is guessed
     llm_config=default_llm_config,
+)
+
+register_function(
+    createCard,
+    caller=group_chat_manager,
+    executor=player_one,
+    description="Create a new card for the game",
 )
 
 result = player_two.initiate_chat(
