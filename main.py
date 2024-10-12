@@ -30,7 +30,7 @@ You are playing a card game. The rules are:
 Your role is {role}.
 """
 
-player_one = ConversableAgent(
+clue_giver = ConversableAgent(
     "clue_giver",
     system_message="""
     you are an ai assistant that is playing a game called Nono words. to begin
@@ -50,16 +50,22 @@ player_one = ConversableAgent(
     description="The clue giver will provide clues to the word guesser based on a provided card",
 )
 
-player_two = ConversableAgent(
+guesser = ConversableAgent(
     "word_guesser",
-    system_message=system_message.format(role="word guesser"),
+    system_message="",
     llm_config=other_llm_config,
     human_input_mode="ALWAYS",
 )
 
+watcher = ConversableAgent(
+    "watcher",
+    system_message="",
+    llm_config=other_llm_config,
+    human_input_mode="NEVER",
+)
 
 group_chat = GroupChat(
-    agents=[player_one, player_two],
+    agents=[clue_giver, guesser, watcher],
     messages=[],
 )
 
@@ -71,12 +77,12 @@ group_chat_manager = GroupChatManager(
 
 register_function(
     createCard,
-    caller=player_one,
-    executor=player_one,
+    caller=clue_giver,
+    executor=clue_giver,
     description="Create a new card for the game",
 )
 
-result = player_two.initiate_chat(
+result = guesser.initiate_chat(
     group_chat_manager,
     message="Let's play!",
 
