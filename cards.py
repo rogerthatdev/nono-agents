@@ -10,7 +10,20 @@ client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
 )
 
-chat_completion = client.chat.completions.create(
+
+# print(chat_completion.choices[0].message.content)
+
+class GameCard(BaseModel):
+    word: str
+    nonoWords: list[str]
+    category: str
+    def __str__(self):
+        return f"Word: {self.word}\nCategory: {self.category}\nNono Words: {', '.join(self.nonoWords)}"
+    
+
+
+def createCard():
+    chat_completion = client.chat.completions.create(
     messages=[
         {
             "role": "user",
@@ -32,15 +45,7 @@ card. For example:
     ],
     model="gpt-3.5-turbo",
 )
+    card_data = json.loads(chat_completion.choices[0].message.content)
+    new_card = GameCard(**card_data)
+    return new_card
 
-print(chat_completion.choices[0].message.content)
-
-class GameCard(BaseModel):
-    word: str
-    nonoWords: list[str]
-    category: str
-    def __str__(self):
-        return f"Word: {self.word}\nCategory: {self.category}\nNono Words: {', '.join(self.nonoWords)}"
-    
-card_data = json.loads(chat_completion.choices[0].message.content)
-new_card = GameCard(**card_data)

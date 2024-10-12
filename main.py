@@ -1,10 +1,11 @@
 import os
 import dotenv
-import cards
+ 
 from autogen import ConversableAgent
+from cards import createCard
 dotenv.load_dotenv()
 
-test_card = cards.new_card
+test_card = createCard()
 
 default_llm_config = {"config_list": [{"model": "gpt-4", "api_key": os.environ["OPENAI_API_KEY"]}]}
 
