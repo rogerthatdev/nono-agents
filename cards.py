@@ -23,6 +23,15 @@ class GameCard(BaseModel):
 
 
 def createCard():
+    """This function returns a playing card for the game Nono Words with
+    the word, category, and list of nono words.
+
+    Args:
+        None
+    
+    Returns:
+        A string representing a playing card
+    """   
     chat_completion = client.chat.completions.create(
     messages=[
         {

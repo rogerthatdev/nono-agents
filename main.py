@@ -32,7 +32,19 @@ Your role is {role}.
 
 player_one = ConversableAgent(
     "clue_giver",
-    system_message=system_message.format(role="clue giver"),
+    system_message="""
+    you are an ai assistant that is playing a game called Nono words. to begin
+    a round of the game, you must request a new card. 
+    
+    the card will contain a word, a category,
+    and a list of words that you cannot say.
+
+    do not draw a new card until the game is over. The game is over when the 
+    other player guesses the word correctly. The other player has 3 tries. Give
+    the other player a one-word clue each 3 times. If they don't guess the word in
+    3 tries, the game is over and you will say "game over"
+    
+    """,
     llm_config=default_llm_config,
     human_input_mode="NEVER",  # never ask for human input
     description="The clue giver will provide clues to the word guesser based on a provided card",
@@ -59,7 +71,7 @@ group_chat_manager = GroupChatManager(
 
 register_function(
     createCard,
-    caller=group_chat_manager,
+    caller=player_one,
     executor=player_one,
     description="Create a new card for the game",
 )
