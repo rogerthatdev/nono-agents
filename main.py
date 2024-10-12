@@ -1,7 +1,7 @@
 import os
 import dotenv
  
-from autogen import ConversableAgent
+from autogen import ConversableAgent, GroupChat, GroupChatManager
 from cards import createCard
 dotenv.load_dotenv()
 
@@ -35,19 +35,30 @@ player_one = ConversableAgent(
     system_message=system_message.format(role="clue giver") + f"{test_card}",
     llm_config=default_llm_config,
     human_input_mode="NEVER",  # never ask for human input
+    description="The clue giver will provide clues to the word guesser based on a provided card",
 )
 
 player_two = ConversableAgent(
     "word_guesser",
     system_message=system_message.format(role="word guesser"),
     llm_config=other_llm_config,
+    human_input_mode="ALWAYS",
+)
+
+
+group_chat = GroupChat(
+    agents=[player_one, player_two],
+    messages=[],
+)
+
+group_chat_manager = GroupChatManager(
+    groupchat=group_chat,
     is_termination_msg=lambda msg: "Correctamundo" in msg["content"],  # terminate if the word is guessed
-   #  human_input_mode="ALWAYS",
-   human_input_mode="NEVER"
+    llm_config=default_llm_config,
 )
 
 result = player_two.initiate_chat(
-    player_one,
+    group_chat_manager,
     message="Let's play!",
-    max_turns=4
+
 )
